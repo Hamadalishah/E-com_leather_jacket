@@ -1,6 +1,6 @@
 # app/schemas.py
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from ..utlis.config import settings  # Ensure correct import path
 
 class ImageRead(BaseModel):
@@ -8,7 +8,7 @@ class ImageRead(BaseModel):
     filename: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ProductRead(BaseModel):
     id: int
@@ -19,10 +19,11 @@ class ProductRead(BaseModel):
     old_price: Optional[float]
     sale: bool
     discount: float
+    product_categories:str
     images: List[ImageRead] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ProductCreate(BaseModel):
     product_name: str
@@ -30,8 +31,9 @@ class ProductCreate(BaseModel):
     stock: int
     price: float
     old_price: Optional[float] = None
-    sale: bool = False
+    sale:bool = Field(default=False)
     discount: float = 0.0
+    product_categories:str
 
 class ProductUpdate(BaseModel):
     product_name: Optional[str] = None
@@ -41,6 +43,7 @@ class ProductUpdate(BaseModel):
     old_price: Optional[float] = None
     sale: Optional[bool] = None
     discount: Optional[float] = None
+    product_categories:Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -15,9 +15,9 @@ class Product(SQLModel, table=True):
     stock: int
     price: float
     old_price: Optional[float] = None
-    sale: bool = False
+    sale:bool = Field(default=False)
     discount: float = Field(default=0.0)
-    product_categories: List["ProductCategory"] = Relationship(back_populates="product")
+    product_categories:str
     images: List["Image"] = Relationship(back_populates="product")
     reviews: List["Review"] = Relationship(back_populates="product")
 
