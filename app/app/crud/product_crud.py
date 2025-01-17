@@ -18,6 +18,11 @@ class ProductCRUD:
         statement = select(Product)
         results = session.exec(statement).all()
         return list(results)  # Ensure it returns a List
+    
+    def get_products_by_category(self, session: Session, category_name: str) -> List[Product]:
+        statement = select(Product).where(Product.category_name == category_name)
+        results = session.exec(statement).all()
+        return list(results)
 
     def update_product(self, session: Session, product_id: int, product_update: ProductUpdate) -> Optional[Product]:
         product = session.get(Product, product_id)

@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from .database.db import create_table
 from contextlib import asynccontextmanager
 from .rout import product_rout,imag_rout
+from .review_routes.routes import router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,6 +16,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.include_router(product_rout.router)
 app.include_router(imag_rout.router)
+app.include_router(router)
 
 @app.get("/")
 def read_root() -> dict:
