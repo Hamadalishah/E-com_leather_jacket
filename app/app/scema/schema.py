@@ -1,7 +1,7 @@
 # app/models.py
 from typing import List, Optional
 from sqlmodel import SQLModel, Field, Relationship
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class Product(SQLModel, table=True):
@@ -17,7 +17,7 @@ class Product(SQLModel, table=True):
     category_name: Optional[str] = Field(default=None)  # Category name as a simple string
     images: List["Image"] = Relationship(back_populates="product")
     reviews: List["Review"] = Relationship(back_populates="product")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
 
 
@@ -36,5 +36,5 @@ class Review(SQLModel, table=True):
     customer_email: str
     review_text: str
     star_rating: int = Field(default=5)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     product: Product = Relationship(back_populates="reviews")

@@ -16,7 +16,7 @@ def create_product(
     product: ProductCreate,
     session: Session = Depends(get_session)
 ):
-    db_product = Product.from_orm(product)
+    db_product = Product.model_validate(product)
     created_product = product_crud.create_product(session, db_product)
     return created_product
 

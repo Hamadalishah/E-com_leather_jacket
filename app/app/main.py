@@ -3,6 +3,8 @@ from .database.db import create_table
 from contextlib import asynccontextmanager
 from .rout import product_rout,imag_rout
 from .review_routes.routes import router
+from fastapi.middleware.cors import CORSMiddleware
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -12,8 +14,24 @@ async def lifespan(app: FastAPI):
     print("Table created successfully")
     yield
     print("Application shutdown")
+    
+
 
 app = FastAPI(lifespan=lifespan)
+
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(product_rout.router)
 app.include_router(imag_rout.router)
 app.include_router(router)

@@ -30,7 +30,7 @@ class ProductCRUD:
             return None  # Handle this case in the endpoint
 
         # Update fields if they are provided
-        product_data = product_update.dict(exclude_unset=True)
+        product_data = product_update.model_dump(exclude_unset=True)
         for key, value in product_data.items():
             setattr(product, key, value)
 
@@ -48,3 +48,10 @@ class ProductCRUD:
         return True
 
 product_crud = ProductCRUD()
+
+
+
+
+def get_all_product(session: Session):
+    product = session.exec(select(Product)).all()
+    return product
