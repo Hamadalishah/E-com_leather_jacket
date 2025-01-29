@@ -9,7 +9,12 @@ connection_string:Optional[str] = os.getenv('DATABASE_URL')
 if not connection_string:
     raise ValueError("DATABASE_URL environment variable not set")
 
-engine = create_engine(connection_string)
+
+connection = str(connection_string).replace(
+    "postgresql", "postgresql+psycopg2"
+)
+engine = create_engine(connection,connect_args={"sslmode":"require"},pool_recycle=300,pool_size=10)
+
 
 def create_table():
     SQLModel.metadata.create_all(engine)

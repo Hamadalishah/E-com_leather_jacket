@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from .rout import product_rout,imag_rout
 from .review_routes.routes import router
 from fastapi.middleware.cors import CORSMiddleware
-
+from .search.search_rout import router3
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,7 +35,9 @@ app.add_middleware(
 app.include_router(product_rout.router)
 app.include_router(imag_rout.router)
 app.include_router(router)
+app.include_router(router3)
 
 @app.get("/")
 def read_root() -> dict:
     return {"Hello": "World"}
+
