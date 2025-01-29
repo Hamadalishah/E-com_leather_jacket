@@ -26,11 +26,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code  
 COPY ./app ./app  
-COPY ./static ./static  
 
-# Security settings  
-RUN useradd -m myuser && chown -R myuser:myuser /app  
-USER myuser  
 
 # Production configs  
 ENV PYTHONUNBUFFERED=1 \  
