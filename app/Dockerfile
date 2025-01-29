@@ -1,24 +1,47 @@
-FROM python:3.12
+# Stage 1: Builder (Install dependencies)  
+FROM python:3.12-slim as builder  
 
-LABEL maintainer="Syed Hamad Ali"
+WORKDIR /app  
 
-# Set the working directory in the container
-WORKDIR /code
+# Install system deps + poetry  
+RUN apt-get update && apt-get install -y --no-install-recommends curl \  
+    && pip install "poetry==1.8.2" \  
+    && rm -rf /var/lib/apt/lists/*  
 
-# Install Poetry
-RUN pip install poetry
+# Copy only dependency files first  
+COPY pyproject.toml poetry.lock ./  
 
-COPY . /code/
+# Install deps without virtualenv (production-only)  
+RUN poetry config virtualenvs.create false \  
+    && poetry install --only main --no-interaction --no-ansi  
 
+# Stage 2: Runtime (Minimal image)  
+FROM python:3.12-slim  
 
-RUN poetry config virtualenvs.create false
+WORKDIR /app  
 
-RUN poetry install
+# Copy installed deps from builder  
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages  
+COPY --from=builder /usr/local/bin /usr/local/bin  
 
-# Copy the rest of the application code
+# Copy application code  
+COPY ./app ./app  
+COPY ./static ./static  
 
-# Expose port 8004
-EXPOSE 8004
+# Security settings  
+RUN useradd -m myuser && chown -R myuser:myuser /app  
+USER myuser  
 
-# Define the default command
-CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--reload", "--log-level", "debug"]
+# Production configs  
+ENV PYTHONUNBUFFERED=1 \  
+    PYTHONPATH=/app \  
+    APP_ENV=production  
+
+EXPOSE 8004  
+
+# Health check (Render compatible)  
+HEALTHCHECK --interval=30s --timeout=5s \  
+  CMD curl --fail http://localhost:8004/health || exit 1  
+
+# Start command  
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8004"]  
