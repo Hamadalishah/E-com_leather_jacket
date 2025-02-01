@@ -1,12 +1,11 @@
 # app/routes/product.py
-from fastapi import APIRouter, Depends, HTTPException, status,Query
-from typing import List,Annotated
-from sqlmodel import Session,select
+from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List
+from sqlmodel import Session
 from ..database.db import get_session
 from ..scema.schema import Product
 from ..crud.product_crud import product_crud
 from ..scema.product_model import ProductRead, ProductCreate, ProductUpdate
-from pydantic import BaseModel
 
 router = APIRouter(
     
@@ -30,7 +29,7 @@ def get_products_by_category(
     products = product_crud.get_products_by_category(session, category_name)
     return products
 
-@router.get("/product", response_model=List[ProductRead])
+@router.get("/products", response_model=List[ProductRead])
 def read_all_products(
     session: Session = Depends(get_session)
 ):
@@ -69,22 +68,3 @@ def delete_product(
     return
 
 
-
-class ProductResponse(BaseModel):
-    products: List[ProductRead]
-    totalCount: int
-
-# Fetch Products from Database
-@router.get("/products", response_model=ProductResponse)
-def get_products(session: Annotated[Session, Depends(get_session)], limit: int = Query(10, ge=1), offset: int = Query(0, ge=0)):
-        # Query products from database
-    statement = select(Product).offset(offset).limit(limit)
-    results = session.exec(statement).all()
-
-        # Count total products in the database
-    total_count = session.query(Product).count()
-
-        # Convert results into Pydantic models
-    products = [ProductRead.from_orm(product) for product in results]
-
-    return {"products": products, "totalCount": total_count}

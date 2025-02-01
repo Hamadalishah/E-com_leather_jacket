@@ -1,24 +1,24 @@
-FROM python:3.12-slim  
+FROM python:3.12
 
-# System dependencies  
-RUN apt-get update && apt-get install -y --no-install-recommends \  
-    libpq-dev gcc python3-dev musl-dev \  
-    && rm -rf /var/lib/apt/lists/*  
+LABEL maintainer="Syed Hamad Ali"
 
-WORKDIR /app  
+# Set the working directory in the container
+WORKDIR /code
 
-# Install Poetry with specific version  
-RUN pip install "poetry==1.8.2"  
+# Install Poetry
+RUN pip install poetry
 
-# Copy dependencies  
-COPY pyproject.toml poetry.lock ./  
+COPY . /code/
 
-# Install Python deps  
-RUN poetry config virtualenvs.create false \  
-    && poetry install --only main --no-interaction --no-ansi  
 
-# Copy app code  
-COPY ./app ./app  
+RUN poetry config virtualenvs.create false
 
-EXPOSE 8004  
-CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8004"]  
+RUN poetry install
+
+# Copy the rest of the application code
+
+# Expose port 8004
+EXPOSE 8004
+
+# Define the default command
+CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--reload", "--log-level", "debug"]

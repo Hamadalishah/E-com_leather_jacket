@@ -13,7 +13,7 @@ if not connection_string:
 connection = str(connection_string).replace(
     "postgresql", "postgresql+psycopg2"
 )
-engine = create_engine(connection,connect_args={"sslmode":"require"},pool_recycle=300,pool_size=10)
+engine = create_engine(connection,connect_args={"sslmode":"require"},pool_recycle=300,pool_size=10,echo=True)
 
 
 def create_table():
